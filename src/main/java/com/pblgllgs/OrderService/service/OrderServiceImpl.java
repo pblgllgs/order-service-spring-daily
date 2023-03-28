@@ -22,13 +22,13 @@ import java.time.Instant;
 @AllArgsConstructor
 public class OrderServiceImpl implements OrderService{
 
-    private final OrderRepository orderRepository;
+    private OrderRepository orderRepository;
 
-    private final ProductService productService;
+    private ProductService productService;
 
-    private final PaymentService paymentService;
+    private PaymentService paymentService;
 
-    private final RestTemplate restTemplate;
+    private RestTemplate restTemplate;
     @Override
     public long placeOrder(OrderRequest orderRequest) {
         log.info("Placing Order Request {}", orderRequest);
