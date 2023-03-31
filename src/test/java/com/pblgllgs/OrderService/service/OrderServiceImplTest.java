@@ -5,7 +5,9 @@ import com.pblgllgs.OrderService.entity.Order;
 import com.pblgllgs.OrderService.exception.CustomException;
 import com.pblgllgs.OrderService.external.client.PaymentService;
 import com.pblgllgs.OrderService.external.client.ProductService;
+import com.pblgllgs.OrderService.external.request.PaymentRequest;
 import com.pblgllgs.OrderService.external.response.PaymentResponse;
+import com.pblgllgs.OrderService.model.OrderRequest;
 import com.pblgllgs.OrderService.model.OrderResponse;
 import com.pblgllgs.OrderService.model.PaymentMode;
 import com.pblgllgs.OrderService.model.ProductResponse;
@@ -18,6 +20,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Instant;
@@ -95,6 +99,65 @@ public class OrderServiceImplTest {
         verify(orderRepository, times(1)).findById(anyLong());
     }
 
+
+
+    @Test
+    @DisplayName("Place Order - Success Scenario")
+    void test_When_Place_Order_Payment_Success(){
+        Order order = getMockOrder();
+        OrderRequest orderRequest = getMockOrderRequest();
+
+        when(orderRepository.save(any(Order.class)))
+                .thenReturn(order);
+        when(productService.reduceQuantity(anyLong(), anyLong()))
+                .thenReturn(new ResponseEntity<Void>(HttpStatus.OK));
+        when(paymentService.doPayment(any(PaymentRequest.class)))
+                .thenReturn(new ResponseEntity<Long>(1L,HttpStatus.OK));
+
+        long orderId =  orderService.placeOrder(orderRequest);
+
+        verify(orderRepository, times(2))
+                .save(any());
+        verify(productService, times(1))
+                .reduceQuantity(anyLong(),anyLong());
+        verify(paymentService, times(1))
+                .doPayment(any(PaymentRequest.class));
+        assertEquals(order.getId(), orderId);
+    }
+
+    @Test
+    @DisplayName("Place Order - Failure Scenario")
+    void test_When_Place_Order_Payment_Fails_then_Order_Placed(){
+        Order order = getMockOrder();
+        OrderRequest orderRequest = getMockOrderRequest();
+
+        when(orderRepository.save(any(Order.class)))
+                .thenReturn(order);
+        when(productService.reduceQuantity(anyLong(), anyLong()))
+                .thenReturn(new ResponseEntity<Void>(HttpStatus.OK));
+        when(paymentService.doPayment(any(PaymentRequest.class)))
+                .thenThrow(new RuntimeException());
+
+        long orderId =  orderService.placeOrder(orderRequest);
+
+        verify(orderRepository, times(2))
+                .save(any());
+        verify(productService, times(1))
+                .reduceQuantity(anyLong(),anyLong());
+        verify(paymentService, times(1))
+                .doPayment(any(PaymentRequest.class));
+        assertEquals(order.getId(), orderId);
+    }
+
+    private OrderRequest getMockOrderRequest() {
+        return OrderRequest.builder()
+                .productId(1)
+                .quantity(10)
+                .paymentMode(PaymentMode.CASH)
+                .totalAmount(100)
+                .build();
+    }
+
     private PaymentResponse getMockPaymentResponse() {
         return PaymentResponse.builder()
                 .paymentId(1)
@@ -109,7 +172,7 @@ public class OrderServiceImplTest {
     private ProductResponse getMockProductResponse() {
         return ProductResponse.builder()
                 .productId(2)
-                .productName("iphone")
+                .productName("iPhone")
                 .price(100)
                 .quantity(200)
                 .build();
