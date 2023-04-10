@@ -19,16 +19,16 @@ public class TestServiceInstanceListSupplier implements ServiceInstanceListSuppl
     public Flux<List<ServiceInstance>> get() {
         List<ServiceInstance> result =  new ArrayList<>();
         result.add(new DefaultServiceInstance(
-                "PAYMENT-SERVICE",
-                "PAYMENT-SERVICE",
+                "payment-service-svc",
+                "payment-service-svc",
                 "localhost",
                 8089,
                 false
         ));
 
         result.add(new DefaultServiceInstance(
-                "PRODUCT-SERVICE",
-                "PRODUCT-SERVICE",
+                "product-service-svc",
+                "product-service-svc",
                 "localhost",
                 8089,
                 false

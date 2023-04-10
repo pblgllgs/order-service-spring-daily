@@ -32,7 +32,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+			<artifactId>spring-cloud-starter-loadbalancer</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.mysql</groupId>
@@ -134,7 +134,7 @@
 					</from>
 					<to>
 						<image>registry.hub.docker.com/pblgllgs/orderservice-dcb</image>
-						<tags>${project.version}</tags>
+						<tags>${project.version}-k8s</tags>
 					</to>
 				</configuration>
 			</plugin>

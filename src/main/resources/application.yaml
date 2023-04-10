@@ -45,6 +45,9 @@ resilience4j:
         permitted-number-of-calls-in-half-open-state: 3
         sliding-window-size: 10
         sliding-window-type: COUNT_BASED
+microservices:
+  product: http://product-service-svc/product/
+  payment: http://payment-service-svc/payment/
 #eureka:
 #  instance:
 #    prefer-ip-address: true
